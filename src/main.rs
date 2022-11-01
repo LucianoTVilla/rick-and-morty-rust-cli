@@ -1,7 +1,7 @@
 use std;
 use reqwest;
 use serde::{Deserialize, Serialize};
-use dialoguer::{theme::ColorfulTheme, Select};
+use dialoguer::{theme::ColorfulTheme, Select, Input};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CharactersResponse {
@@ -92,8 +92,14 @@ pub enum Species {
     #[serde(rename = "Alien")]
     Alien,
 
+    #[serde(rename = "Cronenberg")]
+    Cronenberg,
+
     #[serde(rename = "Human")]
     Human,
+
+    #[serde(rename = "Humanoid")]
+    Humanoid,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -184,6 +190,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Get all characters",
         "Get all episodes",
         "Get all locations",
+        "Search a character by his name"
     ];
 
     let selection = Select::with_theme(&ColorfulTheme::default())
@@ -211,6 +218,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let locations_response = reqwest::get(LOCATIONS_API_URL).await?;
         let locations: LocationsResponse = locations_response.json().await?;
         println!("{:#?}", locations);
+    }
+
+    if selection == 3 {
+        let input: String = Input::with_theme(&ColorfulTheme::default())
+            .with_prompt("Type the character name: ")
+            .interact_text()
+            .unwrap();
+        let custom_api_url = format!("{}/?name={}", CHARACTERS_API_URL, input);
+        let character_response = reqwest::get(custom_api_url).await?;
+        let character: CharactersResponse = character_response.json().await?;
+        println!("{:#?}", character);
     }
     
     Ok(())
