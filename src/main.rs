@@ -193,7 +193,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .interact()
         .unwrap();
 
-    println!("{}", selection);
     println!("You selected: {}", selections[selection]);
 
     if selection == 0 {
